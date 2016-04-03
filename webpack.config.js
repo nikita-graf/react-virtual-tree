@@ -4,90 +4,92 @@ var util = require('util');
 var config;
 
 function createWebpackConfig(options) {
-    var config = {};
-    var plugins;
-    var lessLoader;
-    var cssLoader;
-    var publicPath;
-    var entry;
-    var entryFile = './scr/index.js';
+  var config = {};
+  var plugins;
+  var lessLoader;
+  var cssLoader;
+  var publicPath;
+  var entry;
+  var entryFile = './src/index.js';
 
-    options = options || {};
+  options = options || {};
 
-    if (!options.build) {
-        publicPath = ['http://localhost:8888/'].join('');
-        entry = {
-            app: [
-                'webpack-dev-server/client?' + publicPath,
-                'webpack/hot/only-dev-server',
-                entryFile
-            ]
-        };
-        plugins = [
-            new webpack.NoErrorsPlugin()
-        ];
-        config.devtool = "eval";
-        config.debug = true;
-        config.watch = true;
-    } else {
-        entry = entryFile;
-        plugins = [
-            new ExtractTextPlugin('styles.css'),
-            new webpack.optimize.DedupePlugin(),
-            new webpack.DefinePlugin({
-                'process.env': {
-                    'NODE_ENV': '"production"'
-                },
-                COMPILED_PACKAGE: true
-            }),
-            new webpack.optimize.UglifyJsPlugin()
-        ];
-        config.devtool = "source-map";
-    }
-
-    plugins.push(new webpack.ProvidePlugin({
-        $: "jquery",
-        jQuery: "jquery",
-        'window.jQuery': "jquery",
-        "moment": "moment"
-    }));
-
-    util._extend(config, {
-        node: {
-            fs: "empty"
+  if (!options.build) {
+    publicPath = ['http://localhost:8888/'].join('');
+    entry = {
+      app: [
+        'webpack-dev-server/client?' + publicPath,
+        'webpack/hot/only-dev-server',
+        entryFile,
+        './example/index.js'
+      ]
+    };
+    plugins = [
+      new webpack.NoErrorsPlugin()
+    ];
+    config.devtool = "eval";
+    config.debug = true;
+    config.watch = true;
+  } else {
+    entry = entryFile;
+    plugins = [
+      new ExtractTextPlugin('styles.css'),
+      new webpack.optimize.DedupePlugin(),
+      new webpack.DefinePlugin({
+        'process.env': {
+          'NODE_ENV': '"production"'
         },
-        resolve: {
-            root:  path.resolve(__dirname, 'src')
-        },
-        entry: entry,
-        output: {
-            filename: 'app.js',
-            path: path.resolve(__dirname, 'dist'),
-            publicPath: publicPath
-        },
-        module: {
-            loaders: [
-                {
-                    test: /\.js?$/,
-                    exclude: /node_modules/,
-                    loader: 'babel',
-                    query: {
-                        presets: ['es2015']
-                    }
-                }
-            ]
-        },
-        plugins: plugins
-    });
+        COMPILED_PACKAGE: true
+      }),
+      new webpack.optimize.UglifyJsPlugin()
+    ];
+    config.devtool = "source-map";
+  }
 
-    return config;
+  plugins.push(new webpack.ProvidePlugin({
+    $: "jquery",
+    jQuery: "jquery",
+    'window.jQuery': "jquery",
+    "moment": "moment"
+  }));
+
+  util._extend(config, {
+    node: {
+      fs: "empty"
+    },
+    resolve: {
+      root: path.resolve(__dirname, 'src')
+    },
+    entry: entry,
+    output: {
+      filename: 'app.js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: publicPath
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.js?$/,
+          exclude: /node_modules/,
+          loader: 'babel',
+          query: {
+            presets: ['es2015', 'react'],
+            plugins: ["transform-class-properties"]
+          }
+        }
+      ]
+    },
+    plugins: plugins
+  });
+
+  return config;
 }
 
 
 if (process.argv.indexOf('--build') > -1) {
-    config = createWebpackConfig({build: true});
+  config = createWebpackConfig({build: true});
 } else {
-    config = createWebpackConfig({});
+  config = createWebpackConfig({});
 }
 
 module.exports = config;
