@@ -6,11 +6,10 @@ var config;
 function createWebpackConfig(options) {
   var config = {};
   var plugins;
-  var lessLoader;
-  var cssLoader;
   var publicPath;
   var entry;
   var entryFile = './src/index.js';
+  var example = './example/index.js';
 
   options = options || {};
 
@@ -21,7 +20,7 @@ function createWebpackConfig(options) {
         'webpack-dev-server/client?' + publicPath,
         'webpack/hot/only-dev-server',
         entryFile,
-        './example/index.js',
+        example,
       ],
     };
     plugins = [
@@ -31,7 +30,12 @@ function createWebpackConfig(options) {
     config.debug = true;
     config.watch = true;
   } else {
-    entry = entryFile;
+    entry = {
+      app: [
+        entryFile,
+        example,
+      ],
+    };
     plugins = [
       // new ExtractTextPlugin('styles.css'),
       new webpack.optimize.DedupePlugin(),
@@ -45,13 +49,6 @@ function createWebpackConfig(options) {
     ];
     config.devtool = 'source-map';
   }
-
-  plugins.push(new webpack.ProvidePlugin({
-    $: 'jquery',
-    jQuery: 'jquery',
-    'window.jQuery': 'jquery',
-    moment: 'moment',
-  }));
 
   util._extend(config, {
     node: {
