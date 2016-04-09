@@ -23,17 +23,17 @@ class TreeNode extends React.Component {
     let { node } = this.props;
 
     if (node.children.length === 0) {
-      return <span>{node.data.text}</span>;
+      return <span>Item {node.data.value}</span>;
     } else {
       return (
         <span style={{ fontWeight: 'bold' }}>
-          {node.data.text}
+          Item {node.data.value}
         </span>
       );
     }
   }
 }
-console.log(tree);
+
 ReactDOM.render(
   <VirtualTree nodes={tree}
                itemHeight={30}

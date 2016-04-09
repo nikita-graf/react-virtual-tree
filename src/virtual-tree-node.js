@@ -21,24 +21,21 @@ export default class VirtualTreeNode extends React.Component {
     let hasChildren = node.children && node.children.length;
     let className = block({
       leaf: !hasChildren,
+      collapsed: collapsed,
     });
     let style = {
       paddingLeft: (node.level - 1) * 10 + 'px',
       height: height + 'px',
     };
+    let arrow;
+
+    if (hasChildren) {
+      arrow = <span className={block('arrow')} onClick={this.toggleCollapse}/>
+    }
 
     return (
       <li className={className} style={style}>
-        {
-          hasChildren &&
-          <span className="plai">
-            <div icon="ti-angle-down"
-                 rotated={collapsed}
-                 onClick={this.toggleCollapse}>
-              "+"
-            </div>
-          </span>
-        }
+        {arrow}
         {
           React.cloneElement(children, {
             node: node,

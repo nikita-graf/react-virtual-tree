@@ -73,8 +73,8 @@ export default class VirtualTree extends React.Component {
     } else {
       this.scrollContainer = window;
       updateScrollPosition = () => {
-        // TODO offsetTop
-        let offsetTop = element.offset().top;
+        let offsetTop = element.getBoundingClientRect().top + window.pageYOffset
+          - document.documentElement.clientTop;
         let windowScrollTop =  window.pageYOffset || document.documentElement.scrollTop;
         let scrollPosition = windowScrollTop - offsetTop;
 
@@ -166,7 +166,7 @@ export default class VirtualTree extends React.Component {
   updateViewport = () => {
     this.setState({
       height: this.scrollContainer.innerHeight,
-      width: this.element.width(),
+      width: this.element.offsetWidth,
     });
   };
 

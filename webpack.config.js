@@ -33,7 +33,7 @@ function createWebpackConfig(options) {
   } else {
     entry = entryFile;
     plugins = [
-      new ExtractTextPlugin('styles.css'),
+      // new ExtractTextPlugin('styles.css'),
       new webpack.optimize.DedupePlugin(),
       new webpack.DefinePlugin({
         'process.env': {
