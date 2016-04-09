@@ -6,7 +6,7 @@ let block = bem('virtual-tree-node');
 export default class VirtualTreeNode extends React.Component {
 
   toggleCollapse = () => {
-    let {node, index, collapsed} = this.props;
+    let { node, index, collapsed } = this.props;
 
     this.props[collapsed ? 'onExpand' : 'onCollapse'](node, index);
   };
@@ -16,15 +16,15 @@ export default class VirtualTreeNode extends React.Component {
       node,
       height,
       children,
-      collapsed
+      collapsed,
     } = this.props;
     let hasChildren = node.children && node.children.length;
     let className = block({
-      leaf: !hasChildren
+      leaf: !hasChildren,
     });
     let style = {
       paddingLeft: (node.level - 1) * 10 + 'px',
-      height: height + 'px'
+      height: height + 'px',
     };
 
     return (
@@ -41,7 +41,7 @@ export default class VirtualTreeNode extends React.Component {
         }
         {
           React.cloneElement(children, {
-            node: node
+            node: node,
           })
         }
       </li>

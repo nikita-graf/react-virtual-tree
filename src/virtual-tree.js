@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import bem from 'bem-cn';
 import VirtualTreeNode from './virtual-tree-node';
 import FloatingHeightHelper from './helpers/fixed-height-helper';
@@ -10,7 +11,7 @@ export default class VirtualTree extends React.Component {
 
   constructor(props) {
     let {
-      containerAdjust = 'fixed'
+      containerAdjust = 'fixed',
     } = props;
 
     super(props);
@@ -19,7 +20,7 @@ export default class VirtualTree extends React.Component {
       width: 0,
       position: 0,
       prevPosition: 0,
-      items: props.items
+      nodes: props.nodes,
     };
     this.nodeToHiddenChilds = {};
     this.collapsedNodes = {};
@@ -42,12 +43,19 @@ export default class VirtualTree extends React.Component {
     style.top = -(scrollOffset) + 'px';
   }
 
+  componentWillMount() {
+    this.helper.init(() => {
+      this.updateScrollHeight();
+    });
+  }
+
   componentDidMount() {
     let element = React.findDOMNode(this);
     let updateScrollPosition;
 
     if (this.props.scrollContainer) {
       this.scrollContainer = element;
+
       // TODO css
       //element.css({
       //  overflowY: 'scroll',
@@ -56,10 +64,10 @@ export default class VirtualTree extends React.Component {
       //  height: '100%'
       //});
       updateScrollPosition = () => {
-        let scrollPosition = this.scrollContainer.scrollTop();
+        let scrollPosition = this.scrollContainer.pageYOffset;
 
         this.setState({
-          position: this.normalizeScrollPosition(scrollPosition)
+          position: this.normalizeScrollPosition(scrollPosition),
         });
       };
     } else {
@@ -71,17 +79,17 @@ export default class VirtualTree extends React.Component {
         let scrollPosition = windowScrollTop - offsetTop;
 
         this.setState({
-          position: this.normalizeScrollPosition(scrollPosition)
+          position: this.normalizeScrollPosition(scrollPosition),
         });
-      }
+      };
     }
 
     this.element = element;
     window.addEventListener('resize', this.updateViewport);
-    this.scrollContainer.on('scroll', updateScrollPosition);
+    this.scrollContainer.addEventListener('scroll', updateScrollPosition);
     this.unbind = () => {
       window.removeEventListener('resize', this.updateViewport);
-      this.scrollContainer.off('scroll', updateScrollPosition);
+      this.scrollContainer.removeEventListener('scroll', updateScrollPosition);
     };
 
     // TODO dry
@@ -98,15 +106,15 @@ export default class VirtualTree extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    let {nodes} = this.props;
-    let {nodes: nextNodes} = nextProps;
+    let { nodes } = this.props;
+    let { nodes: nextNodes } = nextProps;
 
     if (nextNodes !== nodes) {
       this.nodeToHiddenChilds = {};
       this.collapsedNodes = {};
 
       this.setState({
-        nodes: nextNodes.slice(0)
+        nodes: nextNodes.slice(0),
       }, () => {
         //this.updateScrollHeight();
         this.helper.init(() => {
@@ -120,22 +128,16 @@ export default class VirtualTree extends React.Component {
     }
   }
 
-  componentWillMount() {
-    this.helper.init(() => {
-      this.updateScrollHeight();
-    });
-  }
-
   componentWillUnmount() {
     this.unbind();
   }
 
   normalizeScrollPosition(position) {
-    let {scrollHeight} = this.state;
+    let { scrollHeight } = this.state;
 
     if (position < 0) {
       position = 0;
-    } else if(position > scrollHeight) {
+    } else if (position > scrollHeight) {
       position = scrollHeight;
     }
 
@@ -146,31 +148,32 @@ export default class VirtualTree extends React.Component {
     let newPosition = this.normalizeScrollPosition(position);
 
     this.setState({
-      position: newPosition
+      position: newPosition,
     }, () => {
       (cb || _.identity)();
+
       //TODO fix 80
       this.scrollContainer.scrollTop(newPosition > 0 ? newPosition + 80 : newPosition);
     });
   }
 
   updateScrollHeight() {
-     this.setState({
-      scrollHeight: this.helper.getScrollHeight()
+    this.setState({
+      scrollHeight: this.helper.getScrollHeight(),
     });
   }
 
   updateViewport = () => {
     this.setState({
-      height: this.scrollContainer.height(),
-      width: this.element.width()
+      height: this.scrollContainer.innerHeight,
+      width: this.element.width(),
     });
   };
 
   getNodeIndexAtPosition(position) {
     let index = this.helper.getRawNodeIndexAtPosition(position);
 
-    return  this.normalizeNodeIndex(index);
+    return this.normalizeNodeIndex(index);
   }
 
   normalizeNodeIndex(index) {
@@ -181,7 +184,7 @@ export default class VirtualTree extends React.Component {
   }
 
   countChildrenAfterIndex(index) {
-    let {nodes} = this.state;
+    let { nodes } = this.state;
     let startNode = nodes[index];
     let node;
     let length = 0;
@@ -200,7 +203,7 @@ export default class VirtualTree extends React.Component {
   }
 
   collapseNode = (node, index) => {
-    let {nodes} = this.state;
+    let { nodes } = this.state;
     let nodeChildrenCount = this.countChildrenAfterIndex(index);
 
     this.collapsedNodes[node.id] = true;
@@ -209,20 +212,19 @@ export default class VirtualTree extends React.Component {
   };
 
   expandNode = (node, index) => {
-    let {nodes} = this.state;
+    let { nodes } = this.state;
     let args = this.nodeToHiddenChilds[node.id].slice(0);
 
     args.unshift(0);
     args.unshift(index + 1);
     nodes.splice.apply(nodes, args);
     this.nodeToHiddenChilds[node.id] = null;
-    //node.collapsed = false;
     this.collapsedNodes[node.id] = false;
     this.updateScrollHeight();
   };
 
   collapseAll() {
-    let {nodes} = this.state;
+    let { nodes } = this.state;
     let rootChildren;
 
     if (!nodes.length) {
@@ -231,7 +233,7 @@ export default class VirtualTree extends React.Component {
 
     rootChildren = nodes[0].parent.children.slice(0);
 
-    for(let id in this.nodeToHiddenChilds) {
+    for (let id in this.nodeToHiddenChilds) {
       let hiddenNodes = this.nodeToHiddenChilds[id];
 
       if (hiddenNodes) {
@@ -241,7 +243,7 @@ export default class VirtualTree extends React.Component {
             this.collapsedNodes[node.id] = true;
             this.nodeToHiddenChilds[node.id] = node.children.slice(0);
           }
-        })
+        });
       }
     }
 
@@ -256,15 +258,13 @@ export default class VirtualTree extends React.Component {
     }
 
     nodes.length = 0;
-    rootChildren.forEach(function(child) {
-      nodes.push(child);
-    });
+    rootChildren.forEach(child => nodes.push(child));
 
     this.updateScrollHeight();
   }
 
   expandAll() {
-    let {nodes} = this.state;
+    let { nodes } = this.state;
     let expandNode = (node, index) => {
       let children = this.nodeToHiddenChilds[node.id];
       let nextIndex = index + 1;
@@ -305,19 +305,19 @@ export default class VirtualTree extends React.Component {
   }
 
   getPlaceholderHeight() {
-    let {scrollHeight, position} = this.state;
-    let containerHeight = this.scrollContainer.height();
+    let { scrollHeight, position } = this.state;
+    let containerHeight = this.scrollContainer ? this.scrollContainer.innerHeight : 0;
     let delta = position > 0 ? 0 : -containerHeight;
 
     return scrollHeight > containerHeight ?  scrollHeight + delta : 0;
   }
 
   render() {
-    let {width, height, position, nodes} = this.state;
-    let {children} = this.props;
+    let { width, height, position, nodes } = this.state;
+    let { children } = this.props;
     let containerStyle = {};
     let placeholderStyle = {
-      height: this.getPlaceholderHeight() + 'px'
+      height: this.getPlaceholderHeight() + 'px',
     };
     let firstNodeIndex = this.normalizeNodeIndex(this.getNodeIndexAtPosition(position));
     let firstItemPosition = this.helper.getPositionByItemIndex(firstNodeIndex);
@@ -339,7 +339,7 @@ export default class VirtualTree extends React.Component {
                          onExpand={this.expandNode}>
           {
             React.cloneElement(children, {
-              ref: i
+              ref: i,
             })
           }
         </VirtualTreeNode>

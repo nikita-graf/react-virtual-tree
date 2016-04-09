@@ -21,13 +21,13 @@ function createWebpackConfig(options) {
         'webpack-dev-server/client?' + publicPath,
         'webpack/hot/only-dev-server',
         entryFile,
-        './example/index.js'
-      ]
+        './example/index.js',
+      ],
     };
     plugins = [
-      new webpack.NoErrorsPlugin()
+      new webpack.NoErrorsPlugin(),
     ];
-    config.devtool = "eval";
+    config.devtool = 'cheap-module-eval-source-map';
     config.debug = true;
     config.watch = true;
   } else {
@@ -37,34 +37,34 @@ function createWebpackConfig(options) {
       new webpack.optimize.DedupePlugin(),
       new webpack.DefinePlugin({
         'process.env': {
-          'NODE_ENV': '"production"'
+          NODE_ENV: '"production"',
         },
-        COMPILED_PACKAGE: true
+        COMPILED_PACKAGE: true,
       }),
-      new webpack.optimize.UglifyJsPlugin()
+      new webpack.optimize.UglifyJsPlugin(),
     ];
-    config.devtool = "source-map";
+    config.devtool = 'source-map';
   }
 
   plugins.push(new webpack.ProvidePlugin({
-    $: "jquery",
-    jQuery: "jquery",
-    'window.jQuery': "jquery",
-    "moment": "moment"
+    $: 'jquery',
+    jQuery: 'jquery',
+    'window.jQuery': 'jquery',
+    moment: 'moment',
   }));
 
   util._extend(config, {
     node: {
-      fs: "empty"
+      fs: 'empty',
     },
     resolve: {
-      root: path.resolve(__dirname, 'src')
+      root: path.resolve(__dirname, 'src'),
     },
     entry: entry,
     output: {
       filename: 'app.js',
       path: path.resolve(__dirname, 'dist'),
-      publicPath: publicPath
+      publicPath: publicPath,
     },
     module: {
       loaders: [
@@ -74,20 +74,19 @@ function createWebpackConfig(options) {
           loader: 'babel',
           query: {
             presets: ['es2015', 'react'],
-            plugins: ["transform-class-properties"]
-          }
-        }
-      ]
+            plugins: ['transform-class-properties'],
+          },
+        },
+      ],
     },
-    plugins: plugins
+    plugins: plugins,
   });
 
   return config;
 }
 
-
 if (process.argv.indexOf('--build') > -1) {
-  config = createWebpackConfig({build: true});
+  config = createWebpackConfig({ build: true });
 } else {
   config = createWebpackConfig({});
 }

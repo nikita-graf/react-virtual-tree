@@ -1,2 +1,2 @@
-export { VirtualTree } from './virtual-tree';
-export { VirtualTreeNode } from './virtual-tree-node';
+export { default as VirtualTree } from './virtual-tree';
+export { default as buildTree } from './util/build-tree';

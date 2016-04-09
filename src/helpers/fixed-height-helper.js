@@ -1,7 +1,6 @@
 import CommonHelper from './common-helper';
 
 export default class FixedHeightHelper extends CommonHelper {
-
   init(ready) {
     ready();
   }
@@ -11,23 +10,28 @@ export default class FixedHeightHelper extends CommonHelper {
   }
 
   getVisibleNodesCount() {
-    let {itemHeight} = this.component.props;
-    let {height} = this.component.state;
+    let { itemHeight } = this.component.props;
+    let { height } = this.component.state;
 
-    return  Math.ceil(height / itemHeight) + 1;
+    return Math.ceil(height / itemHeight) + 1;
   }
 
   getRawNodeIndexAtPosition(position) {
-    let {itemHeight} = this.component.props;
+    let { itemHeight } = this.component.props;
 
     return Math.floor(position / itemHeight);
   }
 
   getScrollHeight() {
-    let {itemHeight} = this.component.props;
-    let {items} = this.component.state;
+    let { itemHeight } = this.component.props;
+    let { nodes } = this.component.state;
 
-    return itemHeight * items.length;
+    return itemHeight * nodes.length;
   }
 
+  getPositionByItemIndex(index) {
+    let { itemHeight } = this.component.props;
+
+    return itemHeight * index;
+  }
 }
