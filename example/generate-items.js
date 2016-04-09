@@ -8,6 +8,7 @@ export default () => {
 
   for (let i = 0; i < 20000; i++) {
     items.push({
+      id: i,
       type1: getRandomItem(itemTypes1),
       type2: getRandomItem(itemTypes2),
       type3: getRandomItem(itemTypes3),

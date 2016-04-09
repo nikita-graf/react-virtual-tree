@@ -15,6 +15,9 @@ let tree = buildTree({
     {
       key: 'type3',
     },
+    {
+      key: 'id',
+    },
   ],
 });
 

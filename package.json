@@ -7,7 +7,7 @@
     "dev": "./node_modules/.bin/webpack-dev-server --config webpack.config.js --content-base src --display-reasons --display-chunks --progress --hot --port 8888",
     "build": "./node_modules/.bin/webpack --config webpack.config.js --build --display-reasons --progress --bail",
     "gh-pages-folder": "npm run build && mv dist gh-pages && cp example/* gh-pages && cp css/* gh-pages",
-    "gh-pages": "npm run gh-pages-folder && git checkout gh-pages && git add gh-pages && git commit -m 'upd' && git subtree push --prefix gh-pages origin gh-pages"
+    "gh-pages": "npm run gh-pages-folder && git checkout gh-pages && git add gh-pages && git commit -m 'upd' && git subtree push --prefix gh-pages origin gh-pages && git checkout master"
   },
   "author": "",
   "license": "ISC",
