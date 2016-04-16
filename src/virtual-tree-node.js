@@ -1,47 +1,39 @@
-import React from 'react';
-import bem from 'bem-cn';
+import React, { Component } from 'react';
 
-let block = bem('virtual-tree-node');
+const block = 'virtual-tree-node';
 
-export default class VirtualTreeNode extends React.Component {
+export default class VirtualTreeNode extends Component {
 
   toggleCollapse = () => {
-    let { node, index, collapsed } = this.props;
+    let { collapsed } = this.props;
 
-    this.props[collapsed ? 'onExpand' : 'onCollapse'](node, index);
+    this.props[collapsed ? 'onExpand' : 'onCollapse']();
   };
 
   render() {
     let {
       node,
-      height,
-      children,
       collapsed,
+      renderContent,
     } = this.props;
-    let hasChildren = node.children && node.children.length;
-    let className = block({
-      leaf: !hasChildren,
-      collapsed: collapsed,
-    });
+    let isLeaf = node.isLeaf();
+    let leafClassName = isLeaf ? block + '_leaf' : '';
+    let collapsedClassName = collapsed ? block + '_collapsed' : '';
+    let className = `${block} ${leafClassName} ${collapsedClassName}`;
     let style = {
       paddingLeft: (node.level - 1) * 10 + 'px',
-      height: height + 'px',
     };
     let arrow;
 
-    if (hasChildren) {
-      arrow = <span className={block('arrow')} onClick={this.toggleCollapse}/>
+    if (!isLeaf) {
+      arrow = <span className="virtual-tree-node__arrow" onClick={this.toggleCollapse}/>;
     }
 
     return (
-      <li className={className} style={style}>
+      <div className={className} style={style}>
         {arrow}
-        {
-          React.cloneElement(children, {
-            node: node,
-          })
-        }
-      </li>
+        {renderContent(node)}
+      </div>
     );
   }
 

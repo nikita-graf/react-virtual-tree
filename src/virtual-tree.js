@@ -1,17 +1,14 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import bem from 'bem-cn';
+import React, { Component } from 'react';
+import { findDOMNode } from 'react-dom';
 import VirtualTreeNode from './virtual-tree-node';
 import FloatingHeightHelper from './helpers/fixed-height-helper';
 import FixedHeightHelper from './helpers/fixed-height-helper';
 
-let block = bem('virtual-tree');
-
-export default class VirtualTree extends React.Component {
+export default class VirtualTree extends Component {
 
   constructor(props) {
     let {
-      containerAdjust = 'fixed',
+      itemHeight,
     } = props;
 
     super(props);
@@ -22,35 +19,21 @@ export default class VirtualTree extends React.Component {
       prevPosition: 0,
       nodes: props.nodes,
     };
-    this.nodeToHiddenChilds = {};
-    this.collapsedNodes = {};
-    this.helper = typeof itemHeight === 'function'
+    this._nodeToHiddenChilds = {};
+    this._collapsedNodes = {};
+    this._helper = typeof itemHeight === 'function'
       ? new FloatingHeightHelper(this)
       : new FixedHeightHelper(this);
-    this.adjustContainerStyle = containerAdjust === 'fixed'
-      ? this.adjustContainerFixedStyle
-      : this.adjustContainerAbsoluteStyle;
-  }
-
-  // TODO move to helpers
-  adjustContainerFixedStyle(style, position, scrollOffset) {
-    style.position = 'fixed';
-    style.top = -(scrollOffset) + 'px';
-  }
-
-  adjustContainerAbsoluteStyle(style, position, scrollOffset) {
-    style.position = 'absolute';
-    style.top = -(scrollOffset) + 'px';
   }
 
   componentWillMount() {
-    this.helper.init(() => {
-      this.updateScrollHeight();
+    this._helper.init(() => {
+      this._updateScrollHeight();
     });
   }
 
   componentDidMount() {
-    let element = React.findDOMNode(this);
+    let element = findDOMNode(this);
     let updateScrollPosition;
 
     if (this.props.scrollContainer) {
@@ -67,7 +50,7 @@ export default class VirtualTree extends React.Component {
         let scrollPosition = this.scrollContainer.pageYOffset;
 
         this.setState({
-          position: this.normalizeScrollPosition(scrollPosition),
+          position: this._normalizeScrollPosition(scrollPosition),
         });
       };
     } else {
@@ -79,25 +62,25 @@ export default class VirtualTree extends React.Component {
         let scrollPosition = windowScrollTop - offsetTop;
 
         this.setState({
-          position: this.normalizeScrollPosition(scrollPosition),
+          position: this._normalizeScrollPosition(scrollPosition),
         });
       };
     }
 
     this.element = element;
-    window.addEventListener('resize', this.updateViewport);
+    window.addEventListener('resize', this._updateViewport);
     this.scrollContainer.addEventListener('scroll', updateScrollPosition);
     this.unbind = () => {
-      window.removeEventListener('resize', this.updateViewport);
+      window.removeEventListener('resize', this._updateViewport);
       this.scrollContainer.removeEventListener('scroll', updateScrollPosition);
     };
 
     // TODO dry
-    this.updateViewport();
-    this.updateScrollHeight();
+    this._updateViewport();
+    this._updateScrollHeight();
     setTimeout(() => {
-      this.updateViewport();
-      this.updateScrollHeight();
+      this._updateViewport();
+      this._updateScrollHeight();
     }, 0);
 
     if (this.props.collapsed) {
@@ -110,15 +93,15 @@ export default class VirtualTree extends React.Component {
     let { nodes: nextNodes } = nextProps;
 
     if (nextNodes !== nodes) {
-      this.nodeToHiddenChilds = {};
-      this.collapsedNodes = {};
+      this._nodeToHiddenChilds = {};
+      this._collapsedNodes = {};
 
       this.setState({
         nodes: nextNodes.slice(0),
       }, () => {
-        //this.updateScrollHeight();
-        this.helper.init(() => {
-          this.updateScrollHeight();
+        //this._updateScrollHeight();
+        this._helper.init(() => {
+          this._updateScrollHeight();
         });
 
         if (this.props.collapsed) {
@@ -132,7 +115,15 @@ export default class VirtualTree extends React.Component {
     this.unbind();
   }
 
-  normalizeScrollPosition(position) {
+  _renderNode(params) {
+    let { renderNode, renderContent } = this.props;
+
+    return renderNode
+      ? renderNode(params)
+      : <VirtualTreeNode renderContent={renderContent} {...params}/>;
+  }
+
+  _normalizeScrollPosition(position) {
     let { scrollHeight } = this.state;
 
     if (position < 0) {
@@ -144,46 +135,46 @@ export default class VirtualTree extends React.Component {
     return Math.round(position);
   }
 
-  scrollTo(position, cb) {
-    let newPosition = this.normalizeScrollPosition(position);
+  // scrollTo(position, cb) {
+  //   let newPosition = this._normalizeScrollPosition(position);
+  //
+  //   this.setState({
+  //     position: newPosition,
+  //   }, () => {
+  //     (cb || _.identity)();
+  //
+  //     //TODO fix 80
+  //     this.scrollContainer.scrollTop(newPosition > 0 ? newPosition + 80 : newPosition);
+  //   });
+  // }
 
+  _updateScrollHeight() {
     this.setState({
-      position: newPosition,
-    }, () => {
-      (cb || _.identity)();
-
-      //TODO fix 80
-      this.scrollContainer.scrollTop(newPosition > 0 ? newPosition + 80 : newPosition);
+      scrollHeight: this._helper.getScrollHeight(),
     });
   }
 
-  updateScrollHeight() {
-    this.setState({
-      scrollHeight: this.helper.getScrollHeight(),
-    });
-  }
-
-  updateViewport = () => {
+  _updateViewport = () => {
     this.setState({
       height: this.scrollContainer.innerHeight,
       width: this.element.offsetWidth,
     });
   };
 
-  getNodeIndexAtPosition(position) {
-    let index = this.helper.getRawNodeIndexAtPosition(position);
+  _getNodeIndexAtPosition(position) {
+    let index = this._helper.getRawNodeIndexAtPosition(position);
 
-    return this.normalizeNodeIndex(index);
+    return this._normalizeNodeIndex(index);
   }
 
-  normalizeNodeIndex(index) {
+  _normalizeNodeIndex(index) {
     index = Math.min(this.state.nodes.length - 1, index);
     index = Math.max(0, index);
 
     return index;
   }
 
-  countChildrenAfterIndex(index) {
+  _countChildrenAfterIndex(index) {
     let { nodes } = this.state;
     let startNode = nodes[index];
     let node;
@@ -204,23 +195,23 @@ export default class VirtualTree extends React.Component {
 
   collapseNode = (node, index) => {
     let { nodes } = this.state;
-    let nodeChildrenCount = this.countChildrenAfterIndex(index);
+    let nodeChildrenCount = this._countChildrenAfterIndex(index);
 
-    this.collapsedNodes[node.id] = true;
-    this.nodeToHiddenChilds[node.id] = nodes.splice(index + 1, nodeChildrenCount);
-    this.updateScrollHeight();
+    this._collapsedNodes[node.id] = true;
+    this._nodeToHiddenChilds[node.id] = nodes.splice(index + 1, nodeChildrenCount);
+    this._updateScrollHeight();
   };
 
   expandNode = (node, index) => {
     let { nodes } = this.state;
-    let args = this.nodeToHiddenChilds[node.id].slice(0);
+    let args = this._nodeToHiddenChilds[node.id].slice(0);
 
     args.unshift(0);
     args.unshift(index + 1);
     nodes.splice.apply(nodes, args);
-    this.nodeToHiddenChilds[node.id] = null;
-    this.collapsedNodes[node.id] = false;
-    this.updateScrollHeight();
+    this._nodeToHiddenChilds[node.id] = null;
+    this._collapsedNodes[node.id] = false;
+    this._updateScrollHeight();
   };
 
   collapseAll() {
@@ -233,15 +224,15 @@ export default class VirtualTree extends React.Component {
 
     rootChildren = nodes[0].parent.children.slice(0);
 
-    for (let id in this.nodeToHiddenChilds) {
-      let hiddenNodes = this.nodeToHiddenChilds[id];
+    for (let id in this._nodeToHiddenChilds) {
+      let hiddenNodes = this._nodeToHiddenChilds[id];
 
       if (hiddenNodes) {
-        this.nodeToHiddenChilds[id] = nodes[0].parent.children.slice(0);
+        this._nodeToHiddenChilds[id] = nodes[0].parent.children.slice(0);
         hiddenNodes.forEach((node) => {
           if (node.children) {
-            this.collapsedNodes[node.id] = true;
-            this.nodeToHiddenChilds[node.id] = node.children.slice(0);
+            this._collapsedNodes[node.id] = true;
+            this._nodeToHiddenChilds[node.id] = node.children.slice(0);
           }
         });
       }
@@ -250,27 +241,27 @@ export default class VirtualTree extends React.Component {
     for (let i = nodes.length - 1; i >= 0; i--) {
       let node = nodes[i];
 
-      this.collapsedNodes[node.id] = true;
+      this._collapsedNodes[node.id] = true;
 
       if (node.children.length) {
-        this.nodeToHiddenChilds[node.id] = node.children.slice(0);
+        this._nodeToHiddenChilds[node.id] = node.children.slice(0);
       }
     }
 
     nodes.length = 0;
     rootChildren.forEach(child => nodes.push(child));
 
-    this.updateScrollHeight();
+    this._updateScrollHeight();
   }
 
   expandAll() {
     let { nodes } = this.state;
     let expandNode = (node, index) => {
-      let children = this.nodeToHiddenChilds[node.id];
+      let children = this._nodeToHiddenChilds[node.id];
       let nextIndex = index + 1;
 
-      this.nodeToHiddenChilds[node.id] = null;
-      this.collapsedNodes[node.id] = false;
+      this._nodeToHiddenChilds[node.id] = null;
+      this._collapsedNodes[node.id] = false;
 
       if (children) {
         let elementsAfter = nodes.slice(nextIndex);
@@ -281,7 +272,7 @@ export default class VirtualTree extends React.Component {
         for (let i = children.length - 1; i >= 0; i--) {
           let child = children[i];
 
-          this.collapsedNodes[node.id] = false;
+          this._collapsedNodes[node.id] = false;
           nodes[nextIndex + i] = child;
 
           if (child.children.length) {
@@ -301,10 +292,10 @@ export default class VirtualTree extends React.Component {
       expandNode(nodes[i], i);
     }
 
-    this.updateScrollHeight();
+    this._updateScrollHeight();
   }
 
-  getPlaceholderHeight() {
+  _getPlaceholderHeight() {
     let { scrollHeight, position } = this.state;
     let containerHeight = this.scrollContainer ? this.scrollContainer.innerHeight : 0;
     let delta = position > 0 ? 0 : -containerHeight;
@@ -312,57 +303,67 @@ export default class VirtualTree extends React.Component {
     return scrollHeight > containerHeight ?  scrollHeight + delta : 0;
   }
 
-  render() {
-    let { width, height, position, nodes } = this.state;
-    let { children } = this.props;
-    let containerStyle = {};
-    let placeholderStyle = {
-      height: this.getPlaceholderHeight() + 'px',
+  _getPlaceholderStyle() {
+    return {
+      height: this._getPlaceholderHeight() + 'px',
     };
-    let firstNodeIndex = this.normalizeNodeIndex(this.getNodeIndexAtPosition(position));
-    let firstItemPosition = this.helper.getPositionByItemIndex(firstNodeIndex);
+  }
+
+  _getContainerStyle(position, scrollOffset) {
+    let { width } = this.state;
+    let {
+      containerPosition = 'fixed',
+    } = this.props;
+
+    return position > 0
+      ? {
+        position: containerPosition,
+        top: -(scrollOffset) + 'px',
+        width: width + 'px',
+      }
+      : {
+        position: 'static',
+        top: 'auto',
+        width: 'auto',
+      };
+  }
+
+  render() {
+    let { position, nodes } = this.state;
+    let firstNodeIndex = this._normalizeNodeIndex(this._getNodeIndexAtPosition(position));
+    let firstItemPosition = this._helper.getPositionByItemIndex(firstNodeIndex);
     let scrollOffset = position - firstItemPosition;
-    let itemsCount = this.helper.getVisibleNodesCount(firstNodeIndex, scrollOffset);
-    let lastNodeIndex = this.normalizeNodeIndex(firstNodeIndex + itemsCount);
+    let itemsCount = this._helper.getVisibleNodesCount(firstNodeIndex, scrollOffset);
+    let lastNodeIndex = this._normalizeNodeIndex(firstNodeIndex + itemsCount);
     let nodesChunk = [];
 
     for (let i = firstNodeIndex; i <= lastNodeIndex; i++) {
       let node = nodes[i];
 
       nodesChunk.push(
-        <VirtualTreeNode node={node}
-                         collapsed={this.collapsedNodes[node.id]}
-                         index={i}
-                         key={node.id}
-                         height={this.helper.getItemHeight(node)}
-                         onCollapse={this.collapseNode}
-                         onExpand={this.expandNode}>
+        <li className="virtual-tree__node-container"
+            key={node.id}
+            height={this._helper.getItemHeight(node)}>
           {
-            React.cloneElement(children, {
-              ref: i,
+            this._renderNode({
+              node,
+              collapsed: this._collapsedNodes[node.id],
+              onCollapse: this.collapseNode.bind(this, node, i),
+              onExpand: this.expandNode.bind(this, node, i),
             })
           }
-        </VirtualTreeNode>
+        </li>
       );
-    }
-
-    if (position > 0) {
-      this.adjustContainerStyle(containerStyle, position, scrollOffset);
-      containerStyle.width = width + 'px';
-    } else {
-      containerStyle.position = 'static';
-      containerStyle.top = 'auto';
-      containerStyle.width = 'auto';
     }
 
     return (
       <div className="virtual-tree">
-        <div style={containerStyle}>
-          <ul>
-            {nodesChunk}
-          </ul>
-        </div>
-        <div style={placeholderStyle}></div>
+        <ul className="virtual-tree__container"
+            style={this._getContainerStyle(position, scrollOffset)}>
+          {nodesChunk}
+        </ul>
+        <div className="virtual-tree__placeholder"
+             style={this._getPlaceholderStyle()}></div>
       </div>
     );
   }

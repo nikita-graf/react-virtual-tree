@@ -54,7 +54,6 @@ export default class TreeNode {
   clear() {
     this.children = [];
     this.childrenKeys = {};
-    this.allChildrenCount = 0;
   }
 
   isLeaf() {

@@ -1,4 +1,10 @@
-.virtual-tree-node {
+.virtual-tree__container {
+    margin: 0;
+    padding: 0;
+}
+
+.virtual-tree__node-container {
+    display: block;
     list-style: none;
 }
 
