@@ -343,7 +343,7 @@ export default class VirtualTree extends Component {
       nodesChunk.push(
         <li className="virtual-tree__node-container"
             key={node.id}
-            height={this._helper.getItemHeight(node)}>
+            style={{ height: this._helper.getItemHeight(node) }}>
           {
             this._renderNode({
               node,
