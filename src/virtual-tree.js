@@ -16,11 +16,9 @@ export default class VirtualTree extends Component {
       height: 0,
       width: 0,
       position: 0,
-      prevPosition: 0,
       nodes: props.nodes,
     };
-    this._nodeToHiddenChilds = {};
-    this._collapsedNodes = {};
+    this._reset();
     this._helper = typeof itemHeight === 'function'
       ? new FloatingHeightHelper(this)
       : new FixedHeightHelper(this);
@@ -93,9 +91,7 @@ export default class VirtualTree extends Component {
     let { nodes: nextNodes } = nextProps;
 
     if (nextNodes !== nodes) {
-      this._nodeToHiddenChilds = {};
-      this._collapsedNodes = {};
-
+      this._reset();
       this.setState({
         nodes: nextNodes.slice(0),
       }, () => {
@@ -113,6 +109,11 @@ export default class VirtualTree extends Component {
 
   componentWillUnmount() {
     this.unbind();
+  }
+
+  _reset() {
+    this._nodeToHiddenChilds = {};
+    this._collapsedNodes = {};
   }
 
   _renderNode(params) {
@@ -369,6 +370,3 @@ export default class VirtualTree extends Component {
   }
 
 }
-
-//TODO revert
-//classMixin(PlainTree, React.addons.PureRenderMixin);

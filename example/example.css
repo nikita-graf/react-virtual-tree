@@ -1,0 +1,34 @@
+html,
+body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.app {
+    height: 100%;
+}
+
+.app__list {
+    position: fixed;
+    height: 100%;
+    width: 300px;
+    background: #363636;
+}
+
+.app__list-item {
+    display: block;
+    color: #fff;
+    padding: 5px;
+}
+
+.app__list-item_active {
+    color: #546fff;
+}
+
+.app__content {
+    width: 100%;
+    padding: 5px;
+    padding-left: 300px;
+    box-sizing: border-box;
+}
