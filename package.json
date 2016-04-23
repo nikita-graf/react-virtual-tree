@@ -9,7 +9,8 @@
     "es5",
     "es6",
     "dist",
-    "example"
+    "example",
+    "*.md"
   ],
   "scripts": {
     "dev": "./node_modules/.bin/webpack-dev-server --config webpack.config.js --content-base src --display-reasons --display-chunks --progress --hot --port 8888",
