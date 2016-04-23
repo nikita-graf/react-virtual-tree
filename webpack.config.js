@@ -1,91 +1,29 @@
 var webpack = require('webpack');
-var path = require('path');
-var util = require('util');
-var config;
+var NODE_ENV = process.argv.indexOf('--build') > -1 ? 'production' : 'development';
 
-function createWebpackConfig(options) {
-  var config = {};
-  var plugins;
-  var publicPath;
-  var entry;
-  var entryFile = './src/index.js';
-  var example = './example/index.js';
+module.exports = {
 
-  options = options || {};
+  output: {
+    library: 'ReactVirtualTree',
+    libraryTarget: 'umd',
+  },
 
-  if (!options.build) {
-    publicPath = ['http://localhost:8888/'].join('');
-    entry = {
-      app: [
-        'webpack-dev-server/client?' + publicPath,
-        'webpack/hot/only-dev-server',
-        entryFile,
-        example,
-      ],
-    };
-    plugins = [
-      new webpack.NoErrorsPlugin(),
-    ];
-    config.devtool = 'cheap-module-eval-source-map';
-    config.debug = true;
-    config.watch = true;
-  } else {
-    entry = {
-      app: [
-        entryFile,
-        example,
-      ],
-    };
-    plugins = [
-      // new ExtractTextPlugin('styles.css'),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.DefinePlugin({
-        'process.env': {
-          NODE_ENV: '"production"',
-        },
-        COMPILED_PACKAGE: true,
-      }),
-      new webpack.optimize.UglifyJsPlugin(),
-    ];
-    config.devtool = 'source-map';
-  }
+  externals: {
+    react: 'react',
+    'react-dom': 'react-dom',
+  },
 
-  util._extend(config, {
-    node: {
-      fs: 'empty',
-    },
-    resolve: {
-      root: path.resolve(__dirname, 'src'),
-    },
-    entry: entry,
-    output: {
-      filename: 'app.js',
-      path: path.resolve(__dirname, 'dist'),
-      publicPath: publicPath,
-    },
-    module: {
-      loaders: [
-        {
-          test: /\.js?$/,
-          exclude: /node_modules/,
-          loader: 'babel',
-          query: {
-            presets: ['es2015', 'react'],
-            plugins: ['transform-class-properties'],
-          },
-        },
-      ],
-    },
-    plugins: plugins,
-  });
+  module: {
+    loaders: [
+      { test: /\.js$/, exclude: /node_modules/, loader: 'babel' },
+    ],
+  },
 
-  return config;
-}
+  plugins: [
+    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(NODE_ENV),
+    }),
+  ],
 
-if (process.argv.indexOf('--build') > -1) {
-  config = createWebpackConfig({ build: true });
-} else {
-  config = createWebpackConfig({});
-}
-
-module.exports = config;
+};
