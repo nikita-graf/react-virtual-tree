@@ -8,8 +8,8 @@
     "css",
     "es5",
     "es6",
-    "example",
-    "dist"
+    "dist",
+    "example"
   ],
   "scripts": {
     "dev": "./node_modules/.bin/webpack-dev-server --config webpack.config.js --content-base src --display-reasons --display-chunks --progress --hot --port 8888",
@@ -18,7 +18,7 @@
     "gh-pages": "npm run gh-pages-folder && git branch -f gh-pages && git checkout gh-pages && git add gh-pages && git commit -m 'upd' && git push origin :gh-pages && git subtree push --prefix gh-pages origin gh-pages && git checkout master",
     "build-es5": "rm -rf es5 && babel ./src -d es5",
     "build-es6": "rm -rf es6 && cp -r ./src ./es6",
-    "build-dist": "webpack src/index.js dist/react-virtual-tree.js --build",
+    "build-dist": "webpack src/index.js dist/react-virtual-tree.js",
     "build-dist-min": "webpack -p src/index.js dist/react-virtual-tree.min.js --build",
     "publish": "npm run build"
   },
