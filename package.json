@@ -21,7 +21,7 @@
     "build-es6": "rm -rf es6 && cp -r ./src ./es6",
     "build-dist": "webpack src/index.js dist/react-virtual-tree.js",
     "build-dist-min": "webpack -p src/index.js dist/react-virtual-tree.min.js --build",
-    "publish": "npm run build"
+    "prepublish": "npm run build"
   },
   "gh-pages-deploy": {
     "staticpath": "gh-pages-folder",
