@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import bem from 'bem-cn';
 import BasicExample from './basic';
 import CustomNodeExample from './custom-node';
+import './example.css';
+import '../css/react-virtual-tree.css';
 
 let block = bem('app');
 let examples = [
