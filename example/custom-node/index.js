@@ -2,24 +2,6 @@ import React, { Component } from 'react';
 import { VirtualTree, buildTree } from '../../src';
 import generateItems from '../generate-items';
 
-let tree = buildTree({
-  items: generateItems(),
-  levels: [
-    {
-      key: 'type1',
-    },
-    {
-      key: 'type2',
-    },
-    {
-      key: 'type3',
-    },
-    {
-      key: 'id',
-    },
-  ],
-});
-
 class CustomNode extends Component {
 
   toggleCollapse = () => {
@@ -54,19 +36,37 @@ class CustomNode extends Component {
 
 }
 
-export default () => (
-  <VirtualTree nodes={tree}
-               itemHeight={30}
-               collapsed={true}
-               renderNode={({
-                node,
-                collapsed,
-                onCollapse,
-                onExpand,
-               }) => (
-                <CustomNode node={node}
-                            collapsed={collapsed}
-                            onCollapse={onCollapse}
-                            onExpand={onExpand}/>
-               )}/>
-);
+export default () => {
+  let tree = buildTree({
+    items: generateItems(),
+    levels: [
+      {
+        key: 'type1',
+      },
+      {
+        key: 'type2',
+      },
+      {
+        key: 'type3',
+      },
+      {
+        key: 'id',
+      },
+    ],
+  });
+
+  return <VirtualTree nodes={tree}
+                     itemHeight={30}
+                     collapsed={true}
+                     renderNode={({
+                       node,
+                       collapsed,
+                       onCollapse,
+                       onExpand,
+                     }) => (
+                        <CustomNode node={node}
+                                    collapsed={collapsed}
+                                    onCollapse={onCollapse}
+                                    onExpand={onExpand}/>
+                     )}/>
+};

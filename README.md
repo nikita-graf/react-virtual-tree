@@ -34,6 +34,7 @@ import ReactDOM from 'react-dom';
 import { VirtualTree, buildTree } from 'react-virtual-tree';
 import 'react-virtual-tree/css/react-virtual-tree.css';
 
+// Just as an example. Better move generating of nodes to WebWorker. 
 let nodes = buildTree({
   items: [
     { id: 1, name: 'name1', color: 'red', value: '1' },

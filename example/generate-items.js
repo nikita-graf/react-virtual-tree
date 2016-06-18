@@ -6,7 +6,7 @@ let getRandomItem = (items) => items[Math.floor(Math.random() * items.length)];
 export default () => {
   let items = [];
 
-  for (let i = 0; i < 20000; i++) {
+  for (let i = 0; i < 5000; i++) {
     items.push({
       id: i,
       type1: getRandomItem(itemTypes1),
