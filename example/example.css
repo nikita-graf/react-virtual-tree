@@ -26,6 +26,12 @@ a:hover {
     background: #26272B;
 }
 
+.app__menu a {
+  display: block;
+  color: #6D6E77;
+  width: 100%;
+}
+
 .app__list {
   padding: 0;
   margin: 0;
@@ -36,7 +42,7 @@ a:hover {
 .app__list-item {
   display: block;
   font-weight: bold;
-  color: #6D6E77;
+  color: #3C3D41;
   padding: 10px 10px;
   font-size: 1em;
 }
@@ -55,8 +61,8 @@ a:hover {
   background: #201F24;
 }
 
-.app__list-item_active {
-    color: #546fff;
+.app__list-item_active .app__link {
+  color: #546fff;
 }
 
 .app__header {

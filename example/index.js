@@ -41,9 +41,12 @@ class App extends Component {
       <div className={block}>
         <div className={block('menu')}>
           <h2 className={block('header')}>React Virtual Tree</h2>
-          <h3 className={block('list-header')}>
-            <a href="https://github.com/nikita-graf/react-virtual-tree#props">Docs</a>
-          </h3>
+          <ul className={block('list')}>
+            <li className={block('list-item')}>
+              <a className={block('link')}
+                 href="https://github.com/nikita-graf/react-virtual-tree#props">Docs</a>
+            </li>
+          </ul>
           <h3 className={block('list-header')}>Examples</h3>
           <ul className={block('list')}>
             {
@@ -52,9 +55,12 @@ class App extends Component {
                   active: example === activeExample,
                 });
 
-                return <a className={className}
-                          key={index}
-                          onClick={this.changeExample.bind(this, example)}>{example.title}</a>;
+                return (
+                  <li className={className} key={index}>
+                    <a className={block('link')}
+                       onClick={this.changeExample.bind(this, example)}>{example.title}</a>
+                  </li>
+                );
               })
             }
           </ul>
