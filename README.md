@@ -1,25 +1,28 @@
 # [React Virtual Tree](http://nikita-graf.github.io/react-virtual-tree/)
 
-Installation
----------------
-
+### Installation
 Using npm:
 ```
 $ npm install react-virtual-tree --save
 ```
-Package provides ES6, ES5, UMD modules:
+Package provides different types of modules:
 ```javascript
+//ES6
 import { VirtualTree, buildTree } from 'react-virtual-tree';
+
+//ES5
 var VirtualTree = require('react-virtual-tree').VirtualTree;
 var buildTree = require('react-virtual-tree').buildTree;
+
+//UMD
 <script src="path-to-react-virtual-tree/dist/react-virtual-tree.min.js"></script>
 ```
 
-### Prop Types
-| Property | Type | Required? | Description |
+### Props
+| Prop | Type | Required | Description |
 |:---|:---|:---:|:---|
 | nodes | Nodes | ✓ | Nodes created by `buildTree` function  |
-
+| nodes | Nodes | ✓ | Nodes created by `buildTree` function  |
 ### Example
 
 ```javascript
