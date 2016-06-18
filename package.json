@@ -14,9 +14,10 @@
   ],
   "scripts": {
     "dev": "webpack --config example/webpack.config.js",
+    "build-example": "webpack --config example/webpack.config.js --build",
     "build": "npm run build-es5 && npm run build-es6 && npm run build-dist && npm run build-dist-min",
-    "gh-pages-folder": "npm run build && mv dist gh-pages && cp -r example/* gh-pages && cp css/* gh-pages",
-    "gh-pages": "npm run gh-pages-folder && git branch -f gh-pages && git checkout gh-pages && git add gh-pages && git commit -m 'upd' && git push origin :gh-pages && git subtree push --prefix gh-pages origin gh-pages && git checkout master",
+    "gh-pages-folder": "npm run build-example && cp -r example/* gh-pages",
+    "gh-pages": "npm run gh-pages-folder && git branch -f gh-pages && git checkout gh-pages && git add gh-pages -f && git commit -m 'upd' && git push origin :gh-pages && git subtree push --prefix gh-pages origin gh-pages && git checkout master",
     "build-es5": "rm -rf es5 && babel ./src -d es5",
     "build-es6": "rm -rf es6 && cp -r ./src ./es6",
     "build-dist": "webpack --config ./webpack.config.js src/index.js dist/react-virtual-tree.js",

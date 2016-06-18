@@ -3,3 +3,4 @@ node_modules
 es5
 es6
 dist
+npm-debug.log
