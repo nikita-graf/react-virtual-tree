@@ -22,7 +22,10 @@ var buildTree = require('react-virtual-tree').buildTree;
 | Prop | Type | Required | Description |
 |:---|:---|:---:|:---|
 | nodes | Nodes | ✓ | Nodes created by `buildTree` function  |
-| nodes | Nodes | ✓ | Nodes created by `buildTree` function  |
+| itemHeight | Int, Function | ✓ | Height of node. Could be a function that returns height for each node. |
+| collapsed | Boolean |  | Collapse tree or not at first render |
+| renderContent | Function |  | Returns content of node  |
+| renderNode | Function |  | Returns custom component for node  |
 ### Example
 
 ```javascript
