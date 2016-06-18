@@ -39,18 +39,25 @@ class App extends Component {
 
     return (
       <div className={block}>
-        <div className={block('list')}>
-          {
-            examples.map((example, index) => {
-              let className = block('list-item')({
-                active: example === activeExample,
-              });
+        <div className={block('menu')}>
+          <h2 className={block('header')}>React Virtual Tree</h2>
+          <h3 className={block('list-header')}>
+            <a href="https://github.com/nikita-graf/react-virtual-tree#props">Docs</a>
+          </h3>
+          <h3 className={block('list-header')}>Examples</h3>
+          <ul className={block('list')}>
+            {
+              examples.map((example, index) => {
+                let className = block('list-item')({
+                  active: example === activeExample,
+                });
 
-              return <a className={className}
-                        key={index}
-                        onClick={this.changeExample.bind(this, example)}>{example.title}</a>;
-            })
-          }
+                return <a className={className}
+                          key={index}
+                          onClick={this.changeExample.bind(this, example)}>{example.title}</a>;
+              })
+            }
+          </ul>
         </div>
         <div className={block('content')}>
           {activeExample.component}
